@@ -102,19 +102,19 @@ void printBoard(Board board)
 	int i, j;
 
 	printf("------------------------------------------\n");
-	printf(" | a  | b  | c  | d  | e  | f  | g  | h  |\n");
+	printf(" | a0 | b1 | c2 | d3 | e4| f5 | g6 | h7 |\n");
 	for (j = SIDE_SIZE - 1; j >= 0; j--)
 	{
-		printf("%i", j + 1);
+		printf("%i", j);
 		printf("%c", DELIM);
 		for (i = 0; i < SIDE_SIZE; i++)
 		{
 			printPiece(bGet(board, i, j));
 			printf("%c", DELIM);
 		}
-		printf("%i", j + 1);
+		printf("%i", j);
 		printf("\n");
 	}
-	printf(" | a  | b  | c  | d  | e  | f  | g  | h  |\n");
+	printf(" | a0 | b1 | c2 | d3 | e4 | f5 | g6 | h7 |\n");
 	printf("------------------------------------------\n");
 }

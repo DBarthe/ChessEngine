@@ -5,7 +5,7 @@
 # define PIECE_MASK 0x7
 # define COLOR_MASK 0x8
 
-enum
+enum Piece
   {
     noPiece = 0,
     king = 1,
@@ -20,7 +20,7 @@ typedef unsigned char Piece;
 
 //int pieceValueTab[7] = {0, KING_VALUE, QUEEN_VALUE, ROCK_VALUE, BISHOP_VALUE, KNIGHT_VALUE, PAWN_VALUE };
 
-typedef enum
+typedef enum Color
   {
     white = 0 << 3,
     black = 1 << 3
@@ -90,13 +90,17 @@ typedef enum
 typedef unsigned char Case;
 typedef Case Board[SQUARES_NUMBER+3];
 
-typedef struct
+# define ENPASSANT_DANGER 1
+# define ENPASSANT_EAT 2
+
+typedef struct Move
 {
   int srcX;
   int srcY;
   int dstX;
   int dstY;
   int promotion;
+  unsigned char enpassant;
 } Move;
 
 

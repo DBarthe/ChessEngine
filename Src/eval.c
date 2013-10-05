@@ -79,7 +79,6 @@ static Mark evalCenterControl(Board board, Color color)
 {
 	(void)board;
 	(void)color;
-
 	return 0;
 }
 
@@ -88,7 +87,7 @@ static Mark evalCenterControl(Board board, Color color)
  *
  * Returns the evaluation of the board for the parameter 'color'
  */
-Mark ia_eval(Board board, Color color)
+Mark eval(Board board, Color color)
 {
 	Mark finalMark;
 	Mark materialMark;

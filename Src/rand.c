@@ -21,6 +21,6 @@ void initSeed(void)
  */
 int bornedRand(int inf, int sup)
 {
-	assert(inf < sup);
+	assert(inf <= sup);
 	return rand() % (sup+1 - inf) + inf;
 }

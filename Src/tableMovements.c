@@ -7,14 +7,15 @@
  */
 
 #include <stdlib.h>
-#include "movements.h"
+#include "ia.h"
+#include "piecesMovements.h"
 
 MovementFunction tableMovements[7] = {
 		NULL,
-		&ia_moveKing,
-		&ia_moveQueen,
-		&ia_moveRock,
-		&ia_moveBishop,
-		&ia_moveKnight,
-		&ia_movePawn
+		&addKingMovesToList,
+		&addQueenMovesToList,
+		&addRockMovesToList,
+		&addBishopMovesToList,
+		&addKnightMovesToList,
+		&addPawnMovesToList,
 };

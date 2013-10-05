@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include "movesList.h"
 #include "rand.h"
 
@@ -75,12 +76,14 @@ void setMovesListEmpty(MovesList *list)
 
 /*
  * Choices and returns a random move in the list
+ * list must contain at least one move
  */
 Move getRandomMove(MovesList *list)
 {
 	MoveLink *curLink;
 	int randNumber, i;
 
+	assert(list->length > 0);
 	randNumber = bornedRand(0, list->length - 1);
 	i = 0;
 	curLink = list->head;

@@ -6,6 +6,8 @@
  * Contains project macros.
  */
 
+
+
 #ifdef DEBUG
 # define IFDEBUG(instruction) instruction
 # define IFNDEBUG(instruction)
@@ -15,5 +17,7 @@
 # define IFDEBUG(instruction)
 # define IFNDEBUG(instruction) instruction
 # define IFDEBUG_PRINT(msg)
+
+
 #endif /* DEBUG */
 
