@@ -1,3 +1,11 @@
+/*
+ * ChessEngine
+ *
+ * file main.c in Src/
+ *
+ * This file contain the main function of the project
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +26,9 @@ static void gameSimultating(Board board)
 
 	initBoard(board);
 	printBoard(board);
+
+	//bSet(board,6,0,0);
+	//bSet(board,5,0,0);
 
 	color = white;
 	while (!stop)

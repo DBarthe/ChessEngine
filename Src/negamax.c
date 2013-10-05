@@ -62,13 +62,7 @@ Mark negamax(Board board, Color color, int depth, Mark alpha, Mark beta)
 
 			tmp = -negamax(board, color^COLOR_ON, depth-1, -beta, -alpha);
 
-			bSet(board, move.srcX, move.srcY, myPiece);
-			bSet(board, move.dstX, move.dstY, oldPiece);
-			if (move.enpassant == ENPASSANT_DANGER)
-				board[ENPASSANT_INDEX(color)] &= ~(1 << move.srcX);
-			else if (move.enpassant == ENPASSANT_EAT)
-				bSet(board, move.dstX, move.srcY, pawn | (color ^ COLOR_ON));
-			board[ROCK_INDEX] = rocksInfoSave;
+			undoMovement(board, color, move, myPiece, oldPiece, rocksInfoSave);
 
 			if (tmp > alpha)
 			{
@@ -78,26 +72,20 @@ Mark negamax(Board board, Color color, int depth, Mark alpha, Mark beta)
 
 			if (alpha > beta)
 			{
+				break;
 				board[ENPASSANT_INDEX(color)] = enpassant;
 				setMovesListEmpty(&movesList);
 				return alpha;
 			}
 		}
-
 	}
 
 	if (hasMove == RET_NOMOVE && alpha == MARK_MIN)
 	{
 		if (-negamax(board, color^COLOR_ON, 1, MARK_MIN, MARK_MAX) == MARK_MIN)
-		{
-			IFDEBUG_PRINT("MAT");
 			alpha = MARK_MAT_LOSE;
-		}
 		else
-		{
-			IFDEBUG_PRINT("PAT");
 			alpha = MARK_PAT;
-		}
 	}
 
 	board[ENPASSANT_INDEX(color)] = enpassant;

@@ -1,3 +1,8 @@
+/*
+ * ChessEngine
+ *
+ * file chess.h in Inludes/
+ */
 
 #ifndef CHESS_H_
 # define CHESS_H_
@@ -93,6 +98,10 @@ typedef Case Board[SQUARES_NUMBER+3];
 # define ENPASSANT_DANGER 1
 # define ENPASSANT_EAT 2
 
+# define NO_ROCK 0
+# define ROCK_LEFT 1
+# define ROCK_RIGHT 2
+
 typedef struct Move
 {
   int srcX;
@@ -101,6 +110,7 @@ typedef struct Move
   int dstY;
   int promotion;
   unsigned char enpassant;
+  unsigned char rock;
 } Move;
 
 

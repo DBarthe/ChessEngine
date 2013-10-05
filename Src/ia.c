@@ -52,11 +52,8 @@ int search(Board board, Color color, int depth, Move *moveBuffer)
 		myPiece = bGet(board, move.srcX, move.srcY);
 		oldPiece = bGet(board, move.dstX, move.dstY);
 
-		//printf("move src={%d;%d} dst={%d;%d}\n", move.srcX, move.srcY, move.dstX, move.dstY);
-
 		if ((oldPiece & PIECE_MASK) == king)
 		{
-			//printf("eat king, src={%d;%d} dst={%d;%d}\n", move.srcX, move.srcY, move.dstX, move.dstY);
 			board[ENPASSANT_INDEX(color)] = enpassant;
 			setMovesListEmpty(&resultsList);
 			setMovesListEmpty(&movesList);
@@ -65,21 +62,8 @@ int search(Board board, Color color, int depth, Move *moveBuffer)
 
 		rocksInfoSave = board[ROCK_INDEX];
 		applyMovement(board, color, myPiece, move);
-
 		tmp = -negamax(board, color^COLOR_ON, depth-1, MARK_MIN, -alpha);
-		/*if (tmp == MARK_MIN)
-			printf("src={%d;%d} dst={%d;%d} return MIN\n", move.srcX, move.srcY, move.dstX, move.dstY);
-		else
-			printf("src={%d;%d} dst={%d;%d} return %d\n", move.srcX, move.srcY, move.dstX, move.dstY, tmp);
-		 */
-		bSet(board, move.srcX, move.srcY, myPiece);
-		bSet(board, move.dstX, move.dstY, oldPiece);
-		if (move.enpassant == ENPASSANT_DANGER)
-			board[ENPASSANT_INDEX(color)] &= ~(1 << move.srcX);
-		else if (move.enpassant == ENPASSANT_EAT)
-			bSet(board, move.dstX, move.srcY, pawn | (color ^ COLOR_ON));
-		board[ROCK_INDEX] = rocksInfoSave;
-
+		undoMovement(board, color, move, myPiece, oldPiece, rocksInfoSave);
 
 		if (tmp > alpha || (alpha == tmp && alpha > MARK_MIN))
 		{
@@ -96,15 +80,9 @@ int search(Board board, Color color, int depth, Move *moveBuffer)
 	if (hasMove == RET_NOMOVE)
 	{
 		if (-negamax(board, color^COLOR_ON, 1, MARK_MIN, MARK_MAX) == MARK_MIN)
-		{
-			IFDEBUG_PRINT("MAT");
 			retValue = SEARCH_MAT;
-		}
 		else
-		{
-			IFDEBUG_PRINT("PAT");
 			retValue = SEARCH_PAT;
-		}
 	}
 	else
 	{

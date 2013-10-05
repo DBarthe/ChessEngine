@@ -14,6 +14,7 @@
 # include "ia.h"
 
 void applyMovement(Board board, Color color, Piece piece, Move move);
+void undoMovement(Board board, Color color, Move move, Piece myPiece, Piece oldPiece, Case rocksInfoSave);
 
 MovesList *makeMovesList(Board board, Color color, MovesList *movesList);
 

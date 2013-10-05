@@ -31,13 +31,13 @@ void applyMovement(Board board, Color color, Piece piece, Move move)
 		{
 			if ((move.dstY == 0 && color == white) || (move.dstY == 7 && color == black))
 			{
-				if (move.dstY == 2)
+				if (move.dstX == 2)
 				{
 					bSet(board, 3, move.dstY, rock | color);
 					bSet(board, 0, move.dstY, 0);
 					board[ROCK_INDEX] |= LEFT_ROCK_BIT(color);
 				}
-				else if (move.dstY == 6)
+				else if (move.dstX == 6)
 				{
 					bSet(board, 5, move.dstY, rock | color);
 					bSet(board, 7, move.dstY, 0);
@@ -69,6 +69,38 @@ void applyMovement(Board board, Color color, Piece piece, Move move)
 			bSet(board, move.dstX, move.dstY, queen | color);
 		break;
 	default: break;
+	}
+}
+
+/*
+ * undo a movement.
+ * myPiece is the piece which has moved.
+ * oldPiece is the piece at move.dst[x,y] before the move.
+ * rocksInfoSave is the Rocks bits field before the move.
+ */
+void undoMovement(Board board, Color color, Move move, Piece myPiece, Piece oldPiece, Case rocksInfoSave)
+{
+	bSet(board, move.srcX, move.srcY, myPiece);
+	bSet(board, move.dstX, move.dstY, oldPiece);
+	if (move.enpassant == ENPASSANT_DANGER)
+		board[ENPASSANT_INDEX(color)] &= ~(1 << move.srcX);
+	else if (move.enpassant == ENPASSANT_EAT)
+		bSet(board, move.dstX, move.srcY, pawn | (color ^ COLOR_ON));
+	board[ROCK_INDEX] = rocksInfoSave;
+	if ((myPiece & PIECE_MASK) == king)
+	{
+		switch (move.rock)
+		{
+		case ROCK_LEFT:
+			bSet(board, 3, move.dstY, 0);
+			bSet(board, 0, move.dstY, rock | color);
+			break;
+		case ROCK_RIGHT:
+			bSet(board, 5, move.dstY, 0);
+			bSet(board, 7, move.dstY, rock | color);
+			break;
+		default: break;
+		}
 	}
 }
 
@@ -108,6 +140,23 @@ static inline void treatMove(Board board, Color color, MovesList *movesList, Mov
 	}
 }
 
+
+/*
+ * Sets defaults value of structure Move
+ */
+static inline void initMove(Move *movePtr, int srcX, int srcY)
+{
+	/* set source position of move */
+	movePtr->srcX = srcX;
+	movePtr->srcY = srcY;
+
+	/* set specials data */
+	movePtr->promotion = 0;
+	movePtr->enpassant = 0;
+	movePtr->rock = NO_ROCK;
+}
+
+
 /*
  * Adds movements, that the king in [srcX;srcY] can do, to movesList
  */
@@ -115,11 +164,7 @@ MovesList *addKingMovesToList(Board board, Color color, int srcX, int srcY, Move
 {
 	Move move;
 
-	/* set source position of move */
-	move.srcX = srcX;
-	move.srcY = srcY;
-	move.promotion = 0;
-	move.enpassant = 0;
+	initMove(&move, srcX, srcY);
 
 	/* is the piece on the right side ? */
 	move.dstX = srcX + 1;
@@ -183,6 +228,34 @@ MovesList *addKingMovesToList(Board board, Color color, int srcX, int srcY, Move
 		treatMove(board, color, movesList, move);
 	}
 
+	/* rocks */
+	if ((board[ROCK_INDEX] & KING_BIT(color)) == 0)
+	{
+		/* big rock */
+		if ((board[ROCK_INDEX] & LEFT_ROCK_BIT(color)) == 0)
+		{
+			if (bGet(board, 1, srcY) == 0 && bGet(board, 2, srcY) == 0 && bGet(board, 3, srcY) == 0)
+			{
+				move.dstX = 2;
+				move.dstY = srcY;
+				move.rock = ROCK_LEFT;
+				addMoveLink(movesList, move);
+
+			}
+		}
+		/* small rock */
+		if ((board[ROCK_INDEX] & RIGHT_ROCK_BIT(color)) == 0)
+		{
+			if (bGet(board, 5, srcY) == 0 && bGet(board, 6, srcY) == 0)
+			{
+				move.dstX = 6;
+				move.dstY = srcY;
+				move.rock = ROCK_RIGHT;
+				addMoveLink(movesList, move);
+			}
+		}
+	}
+
 	return movesList;
 }
 
@@ -191,11 +264,7 @@ MovesList *addQueenMovesToList(Board board, Color color, int srcX, int srcY, Mov
 	Move move;
 	Piece currentPiece;
 
-	/* set source position of move */
-	move.srcX = srcX;
-	move.srcY = srcY;
-	move.promotion = 0;
-	move.enpassant = 0;
+	initMove(&move, srcX, srcY);
 
 	/* right moves */
 	move.dstX = srcX + 1;
@@ -305,11 +374,7 @@ MovesList *addRockMovesToList(Board board, Color color, int srcX, int srcY, Move
 	Move move;
 	Piece currentPiece;
 
-	/* set source position of move */
-	move.srcX = srcX;
-	move.srcY = srcY;
-	move.promotion = 0;
-	move.enpassant = 0;
+	initMove(&move, srcX, srcY);
 
 	// right
 	move.dstX = srcX + 1;
@@ -368,11 +433,7 @@ MovesList *addBishopMovesToList(Board board, Color color, int srcX, int srcY, Mo
 	Move move;
 	Piece currentPiece;
 
-	/* set source position of move */
-	move.srcX = srcX;
-	move.srcY = srcY;
-	move.promotion = 0;
-	move.enpassant = 0;
+	initMove(&move, srcX, srcY);
 
 	// up + right
 	move.dstX = srcX + 1;
@@ -433,11 +494,7 @@ MovesList *addKnightMovesToList(Board board, Color color, int srcX, int srcY, Mo
 {
 	Move move;
 
-	/* set source position of move */
-	move.srcX = srcX;
-	move.srcY = srcY;
-	move.promotion = 0;
-	move.enpassant = 0;
+	initMove(&move, srcX, srcY);
 
 	// up + right
 	move.dstX = srcX + 1;
@@ -512,11 +569,7 @@ MovesList *addPawnMovesToList(Board board, Color color, int srcX, int srcY, Move
 	Piece currentPiece;
 	int way;
 
-	/* set source position of move */
-	move.srcX = srcX;
-	move.srcY = srcY;
-	move.promotion = 0;
-	move.enpassant = 0;
+	initMove(&move, srcX, srcY);
 
 	way = (color == white ? 1 : -1);
 
