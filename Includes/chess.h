@@ -113,5 +113,7 @@ typedef struct Move
   unsigned char rock;
 } Move;
 
+/* generals functions */
+int gameIsEnded(Board board);
 
 #endif /* CHESS_H_ */

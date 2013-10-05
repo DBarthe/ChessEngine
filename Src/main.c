@@ -12,10 +12,29 @@
 #include "chess.h"
 #include "ia.h"
 #include "piecesMovements.h"
+#include "rand.h"
 
 extern void printBoard(Board board);
 extern void clearBoard(Board board);
 extern void initBoard(Board board);
+
+static void testPieceMovements(Board board, Piece piece, int srcX, int srcY)
+{
+	MovesList list;
+	MoveLink *link;
+
+	clearBoard(board);
+	bSet(board, srcX, srcY, piece);
+
+	list = newMovesList();
+
+	makeMovesList(board, piece & COLOR_MASK, &list);
+	for (link = list.head; link; link = link->next)
+	{
+		applyMovement(board, piece & COLOR_MASK, piece, link->move);
+	}
+	printBoard(board);
+}
 
 static void gameSimultating(Board board)
 {
@@ -23,17 +42,13 @@ static void gameSimultating(Board board)
 	int stop = 0;
 	Color color;
 	Move move;
-
 	initBoard(board);
 	printBoard(board);
-
-	//bSet(board,6,0,0);
-	//bSet(board,5,0,0);
 
 	color = white;
 	while (!stop)
 	{
-		ret = search(board, color, color == white ? 4 : 4, &move);
+		ret = search(board, color, 4, &move);
 		switch (ret)
 		{
 		case SEARCH_OK:
@@ -48,7 +63,11 @@ static void gameSimultating(Board board)
 		printf("color = %d: src{%d;%d} dst{%d;%d}\n", color, move.srcX, move.srcY, move.dstX, move.dstY);
 		printBoard(board);
 		color ^= COLOR_ON;
-		//sleep(1);
+		if (gameIsEnded(board))
+		{
+			printf("null\n");
+			stop = 1;
+		}
 	}
 }
 
@@ -56,14 +75,8 @@ int main(void)
 {
 	Board board;
 
+	initSeed();
 	gameSimultating(board);
-	/*
-  initBoard(board);
-  printBoard(board);
-  //ia_negamax(board, black, 1, MARK_MIN, MARK_MAX);
-  ia_search(board, white, 9);
-  printf("------------------------------\nchoice = \n");
-  printBoard(board);
-	 */
+
 	return 0;
 }

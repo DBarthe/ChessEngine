@@ -34,6 +34,7 @@ typedef int Mark;
 # define MARK_PAT 0
 # define MARK_MAT_WIN (MARK_MAX-10)
 # define MARK_MAT_LOSE (-MARK_MAT_WIN)
+# define MARK_NULL 0
 
 # define KING_VALUE 0
 # define QUEEN_VALUE 9

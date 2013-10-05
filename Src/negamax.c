@@ -28,6 +28,10 @@ Mark negamax(Board board, Color color, int depth, Mark alpha, Mark beta)
 	Move move;
 	Case rocksInfoSave;
 
+	if (gameIsEnded(board))
+	{
+		return MARK_NULL;
+	}
 	if (depth < 1)
 	{
 		return (eval(board, color));

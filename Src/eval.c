@@ -16,7 +16,6 @@
 /*
  * This table contains the material values of each kind of piece.
  * There are stored with the form "piece => value"
- *
  */
 static Mark tableMaterialValues[] = {
 		0,
